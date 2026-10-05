@@ -1,0 +1,119 @@
+openapi: 3.0.0
+info:
+  title: Yanshee Robot API
+  description: API de contrôle pour le robot UBTECH Yanshee via le framework Apollo.
+  version: 1.0.0
+
+servers:
+  - url: http://10.0.3.234:9090/v1
+    description: Adresse IP locale de votre Yanshee
+
+paths:
+  # --- SECTION VOIX ---
+  /voice/tts:
+    get:
+      tags:
+        - Voice
+      summary: Récupérer l'état du TTS
+      responses:
+        '200':
+          description: État actuel de la synthèse vocale
+    put:
+      tags:
+        - Voice
+      summary: Faire parler le robot
+      description: Envoie une chaîne de caractères pour que le robot la prononce.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tts
+              properties:
+                tts:
+                  type: string
+                  example: "Bonjour, je suis le robot Yanshee."
+                language:
+                  type: string
+                  example: "fr-FR"
+                  default: "fr-FR"
+    delete:
+      tags:
+        - Voice
+      summary: Arrêter de parler
+      responses:
+        '200':
+          description: Parole interrompue
+
+  /voice/asr:
+    put:
+      tags:
+        - Voice
+      summary: Lancer la reconnaissance vocale
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timeout:
+                  type: integer
+                  example: 5
+      responses:
+        '200':
+          description: Texte reconnu retourné
+
+  # --- SECTION SYSTÈME ---
+  /devices/battery:
+    get:
+      tags:
+        - System
+      summary: Obtenir l'état de la batterie
+      responses:
+        '200':
+          description: Niveau de charge et voltage
+
+  /devices/volume:
+    get:
+      tags:
+        - System
+      summary: Volume actuel
+    put:
+      tags:
+        - System
+      summary: Régler le volume
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                volume:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+
+  # --- SECTION MOUVEMENTS ---
+  /motions:
+    post:
+      tags:
+        - Motions
+      summary: Exécuter un mouvement (HTS)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "bow"
+                repeat:
+                  type: integer
+                  default: 1
+    delete:
+      tags:
+        - Motions
+      summary: Stopper le mouvement en cours
